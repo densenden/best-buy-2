@@ -1,30 +1,32 @@
-class Product:
+import promotions
 
+class Product:
     def __init__(self, name, price, quantity):
         if not name:
             raise ValueError("Enter a name. This can't be empty.")
-
         if price < 0:
             raise ValueError("Price cannot be negative.")
-
         if quantity < 0:
             raise ValueError("Quantity Error: What were you thinking?")
-
         self.name = name
         self.price = price
         self.quantity = quantity
         self.active = True
+        self.promotion = None  # Add promotion instance variable
 
-    def get_quantity(self):  # -> float
+    def set_promotion(self, promotion):
+        self.promotion = promotion
+
+    def get_promotion(self):
+        return self.promotion
+
+    def get_quantity(self):
         return self.quantity
 
     def set_quantity(self, quantity):
-        if quantity < 0:
-            raise ValueError("We cannot handle negative stock.")
-
         self.quantity = quantity
-
-        self.active = quantity > 0
+        if self.quantity == 0:
+            self.deactivate()
 
     def is_active(self):
         return self.active
@@ -35,22 +37,21 @@ class Product:
     def deactivate(self):
         self.active = False
 
-    def show(self):  # -> str
-        return f"{self.name}, Price: {self.price}, Quantity: {self.quantity}"
+    def show(self):
+        promotion_info = f", Promotion: {self.promotion.name}" if self.promotion else ""
+        return f"{self.name}, Price: {self.price}, Quantity: {self.quantity}{promotion_info}"
 
-    def buy(self, quantity): # -> float
-        # enough there?
+    def buy(self, quantity):
         if quantity > self.quantity:
             raise ValueError(f"We do not have enough {self.name} in stock. Please order maximum {self.quantity} {self.name}")
         if quantity < 0:
-            raise ValueError("We cannot handle negative orders.")
+            raise ValueError("You cannot buy a negative quantity of a product.")
         if quantity == self.quantity:
             self.active = False
-
-        self.quantity = self.quantity - quantity
-
-        return int(self.price * quantity)
-
+        self.quantity -= quantity
+        if self.promotion:
+            return self.promotion.apply_promotion(self, quantity)
+        return self.price * quantity
 
 class NonStockedProduct(Product):
     def __init__(self, name, price):

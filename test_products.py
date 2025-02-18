@@ -1,5 +1,6 @@
 import pytest
 from products import Product, NonStockedProduct, LimitedProduct
+from promotions import Promotion, PercentDiscount, SecondHalfPrice, ThirdOneFree
 
 
 def test_product_initialization():
@@ -103,3 +104,33 @@ def test_limited_product():
     assert product.quantity == 249
 
     assert product.show() == "Shipping, Price: 10, Quantity: 249, Maximum per order: 1"
+
+
+def test_percent_discount():
+    product = Product("MacBook Air M2", 1450, 100)
+    promotion = PercentDiscount("30% off!", 30)
+    product.set_promotion(promotion)
+    assert product.buy(1) == 1015  # 1450 * 0.7
+    assert product.show() == "MacBook Air M2, Price: 1450, Quantity: 99, Promotion: 30% off!"
+
+def test_second_half_price():
+    product = Product("Bose QuietComfort Earbuds", 250, 500)
+    promotion = SecondHalfPrice("Second Half price!")
+    product.set_promotion(promotion)
+    assert product.buy(2) == 375  # 250 + 125
+    assert product.show() == "Bose QuietComfort Earbuds, Price: 250, Quantity: 498, Promotion: Second Half price!"
+
+def test_third_one_free():
+    product = Product("Google Pixel 7", 500, 250)
+    promotion = ThirdOneFree("Third One Free!")
+    product.set_promotion(promotion)
+    assert product.buy(3) == 1000  # 500 * 2
+    assert product.show() == "Google Pixel 7, Price: 500, Quantity: 247, Promotion: Third One Free!"
+
+def test_remove_promotion():
+    product = Product("MacBook Air M2", 1450, 100)
+    promotion = PercentDiscount("30% off!", 30)
+    product.set_promotion(promotion)
+    product.set_promotion(None)  # Remove promotion
+    assert product.buy(1) == 1450  # No discount applied
+    assert product.show() == "MacBook Air M2, Price: 1450, Quantity: 99"
