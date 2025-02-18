@@ -32,7 +32,6 @@ def test_set_quantity():
     assert product.is_active() is False  # Should be deactivated
 
 def test_is_active():
-    # Test the is_active method
     product = Product("MacBook Air M2", 1450, 100)
     assert product.is_active() is True
     product.deactivate()
