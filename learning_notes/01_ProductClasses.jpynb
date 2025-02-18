@@ -1,0 +1,195 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# Step 1: Classes for Product, LimitedProduct, and NonStockedProduct\n",
+    "\n",
+    "In this step, we will define the `Product` class and its subclasses `LimitedProduct` and `NonStockedProduct`."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Product Class\n",
+    "\n",
+    "The `Product` class represents a product with a name, price, and quantity. It includes methods to manage the product's state and perform operations like buying the product."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "metadata": {},
+   "source": [
+    "class Product:\n",
+    "    def __init__(self, name, price, quantity):\n",
+    "        if not name:\n",
+    "            raise ValueError(\"Enter a name. This can't be empty.\")\n",
+    "        self._name = name\n",
+    "        self.price = price\n",
+    "        self.quantity = quantity\n",
+    "        self.active = True\n",
+    "        self.promotion = None  # Add promotion instance variable\n",
+    "\n",
+    "    @property\n",
+    "    def name(self):\n",
+    "        return self._name\n",
+    "\n",
+    "    @property\n",
+    "    def price(self):\n",
+    "\n",
+    "    @price.setter\n",
+    "    def price(self, value):\n",
+    "        if value < 0:\n",
+    "            raise ValueError(\"Price cannot be negative.\")\n",
+    "        self._price = value\n",
+    "\n",
+    "    @property\n",
+    "    def quantity(self):\n",
+    "        return self._quantity\n",
+    "\n",
+    "    @quantity.setter\n",
+    "    def quantity(self, value):\n",
+    "        if value < 0:\n",
+    "        self._quantity = value\n",
+    "        if self._quantity == 0:\n",
+    "            self.deactivate()\n",
+    "\n",
+    "    def set_promotion(self, promotion):\n",
+    "        self.promotion = promotion\n",
+    "\n",
+    "    def get_promotion(self):\n",
+    "        return self.promotion\n",
+    "\n",
+    "    def is_active(self):\n",
+    "        return self.active\n",
+    "\n",
+    "    def activate(self):\n",
+    "        self.active = True\n",
+    "\n",
+    "    def deactivate(self):\n",
+    "        self.active = False\n",
+    "\n",
+    "    def __str__(self):\n",
+    "        promotion_info = f\", Promotion: {self.promotion.name}\" if self.promotion else \"\"\n",
+    "        return f\"{self.name}, Price: ${self.price} Quantity:{self.quantity}{promotion_info}\"\n",
+    "\n",
+    "    def buy(self, quantity):\n",
+    "        if quantity > self.quantity:\n",
+    "        if quantity < 0:\n",
+    "            raise ValueError(\"You cannot buy a negative quantity of a product.\")\n",
+    "        if quantity == self.quantity:\n",
+    "            self.active = False\n",
+    "        self.quantity -= quantity\n",
+    "        if self.promotion:\n",
+    "            return self.promotion.apply_promotion(self, quantity)\n",
+    "        return self.price * quantity\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## LimitedProduct Class\n",
+    "\n",
+    "The `LimitedProduct` class is a subclass of `Product` that adds a maximum quantity limit for each purchase."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "metadata": {},
+   "source": [
+    "class LimitedProduct(Product):\n",
+    "    def __init__(self, name, price, quantity, maximum):\n",
+    "        super().__init__(name, price, quantity)\n",
+    "        self.maximum = maximum\n",
+    "\n",
+    "    def buy(self, quantity):\n",
+    "        if quantity > self.maximum:\n",
+    "            raise ValueError(f\"Cannot buy more than {self.maximum} of {self.name} in one order.\")\n",
+    "        return super().buy(quantity)\n",
+    "\n",
+    "    def show(self):\n",
+    "        return f\"{self.name}, Price: {self.price}, Quantity: {self.quantity}, Maximum per order: {self.maximum}\"\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## NonStockedProduct Class\n",
+    "\n",
+    "The `NonStockedProduct` class is a subclass of `Product` that represents products that are not stocked and cannot have their quantity set."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "metadata": {},
+   "source": [
+    "class NonStockedProduct(Product):\n",
+    "    def __init__(self, name, price):\n",
+    "        super().__init__(name, price, quantity=0)\n",
+    "\n",
+    "    def set_quantity(self, quantity):\n",
+    "        raise ValueError(\"Cannot set quantity for non-stocked products.\")\n",
+    "\n",
+    "    def show(self):\n",
+    "        return f\"{self.name}, Price: {self.price}, Quantity: Not applicable\"\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Testing the Classes\n",
+    "\n",
+    "Let's create instances of each class and test their functionality."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "metadata": {},
+   "source": [
+    "# Create instances of each class\n",
+    "mac = Product(\"MacBook Air M2\", price=1450, quantity=100)\n",
+    "bose = Product(\"Bose QuietComfort Earbuds\", price=250, quantity=500)\n",
+    "pixel = LimitedProduct(\"Google Pixel 7\", price=500, quantity=250, maximum=1)\n",
+    "service = NonStockedProduct(\"Premium Support\", price=100)\n",
+    "\n",
+    "# Test the functionality\n",
+    "print(mac)\n",
+    "print(bose)\n",
+    "print(pixel.show())\n",
+    "print(service.show())\n",
+    "\n",
+    "# Test buying products\n",
+    "print(mac.buy(10))  # Should return 14500\n",
+    "print(mac.quantity)  # Should return 90\n",
+    "\n",
+    "try:\n",
+    "    pixel.buy(2)  # Should raise ValueError\n",
+    "except ValueError as e:\n",
+    "    print(e)\n",
+    "\n",
+    "try:\n",
+    "    service.set_quantity(10)  # Should raise ValueError\n",
+    "except ValueError as e:\n",
+    "    print(e)\n"
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "name": "python",
+   "version": "3.8.5"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 4
+}
