@@ -1,5 +1,5 @@
 import pytest
-from products import Product
+from products import Product, NonStockedProduct, LimitedProduct
 
 
 def test_product_initialization():
@@ -73,3 +73,33 @@ def test_buy():
     assert product.is_active() is False  # Product should be deactivated
 
 
+def test_non_stocked_product():
+    # Test the initialization of a NonStockedProduct instance
+    product = NonStockedProduct("Windows License", 125)
+    assert product.name == "Windows License"
+    assert product.price == 125
+    assert product.quantity == 0
+    assert product.is_active() is True
+
+    with pytest.raises(ValueError):
+        product.set_quantity(10)  # Should raise an exception
+
+    assert product.show() == "Windows License, Price: 125, Quantity: Not applicable"
+
+
+def test_limited_product():
+    # Test the initialization of a LimitedProduct instance
+    product = LimitedProduct("Shipping", 10, 250, 1)
+    assert product.name == "Shipping"
+    assert product.price == 10
+    assert product.quantity == 250
+    assert product.maximum == 1
+    assert product.is_active() is True
+
+    with pytest.raises(ValueError):
+        product.buy(2)  # Should raise an exception
+
+    assert product.buy(1) == 10  # Should be allowed
+    assert product.quantity == 249
+
+    assert product.show() == "Shipping, Price: 10, Quantity: 249, Maximum per order: 1"
