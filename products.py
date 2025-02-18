@@ -4,29 +4,43 @@ class Product:
     def __init__(self, name, price, quantity):
         if not name:
             raise ValueError("Enter a name. This can't be empty.")
-        if price < 0:
-            raise ValueError("Price cannot be negative.")
-        if quantity < 0:
-            raise ValueError("Quantity Error: What were you thinking?")
-        self.name = name
+        self._name = name
         self.price = price
         self.quantity = quantity
         self.active = True
         self.promotion = None  # Add promotion instance variable
+
+    @property
+    def name(self):
+        return self._name
+
+    @property
+    def price(self):
+        return self._price
+
+    @price.setter
+    def price(self, value):
+        if value < 0:
+            raise ValueError("Price cannot be negative.")
+        self._price = value
+
+    @property
+    def quantity(self):
+        return self._quantity
+
+    @quantity.setter
+    def quantity(self, value):
+        if value < 0:
+            raise ValueError("Quantity Error: What were you thinking?")
+        self._quantity = value
+        if self._quantity == 0:
+            self.deactivate()
 
     def set_promotion(self, promotion):
         self.promotion = promotion
 
     def get_promotion(self):
         return self.promotion
-
-    def get_quantity(self):
-        return self.quantity
-
-    def set_quantity(self, quantity):
-        self.quantity = quantity
-        if self.quantity == 0:
-            self.deactivate()
 
     def is_active(self):
         return self.active
@@ -37,9 +51,9 @@ class Product:
     def deactivate(self):
         self.active = False
 
-    def show(self):
+    def __str__(self):
         promotion_info = f", Promotion: {self.promotion.name}" if self.promotion else ""
-        return f"{self.name}, Price: {self.price}, Quantity: {self.quantity}{promotion_info}"
+        return f"{self.name}, Price: ${self.price} Quantity:{self.quantity}{promotion_info}"
 
     def buy(self, quantity):
         if quantity > self.quantity:
@@ -52,6 +66,16 @@ class Product:
         if self.promotion:
             return self.promotion.apply_promotion(self, quantity)
         return self.price * quantity
+
+    def __gt__(self, other):
+        if not isinstance(other, Product):
+            return NotImplemented
+        return self.price > other.price
+
+    def __lt__(self, other):
+        if not isinstance(other, Product):
+            return NotImplemented
+        return self.price < other.price
 
 class NonStockedProduct(Product):
     def __init__(self, name, price):
