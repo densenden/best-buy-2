@@ -3,6 +3,9 @@
 ## Overview
 BestBuy2 is a Python-based store management system that simulates a shopping experience with various products, promotions, and user interactions. The system allows users to list products, show total amounts, make orders, and demonstrate store functionalities.
 
+<img width="1128" alt="Screenshot" src="https://github.com/user-attachments/assets/f28bfe44-e008-43a7-a077-299fb66b167d" />
+
+
 ## Features
 - List all products
 - Show total amount of products
