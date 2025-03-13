@@ -1,5 +1,4 @@
 from colorama import Fore, Style
-from products import Product
 from store import Store
 import products
 import promotions
@@ -8,42 +7,54 @@ def store_demo():
     """Creates instances, simulates a budget-conscious shopping experience, and adds some Aldi-flavor."""
     print(Fore.YELLOW + "Stocking Aldi shelves with top-tier budget products..." + Style.RESET_ALL)
 
-    baguette = Product("Aldi's 39-cent Baguette", price=0.39, quantity=1000)
-    cheese = Product("Aldi’s 1-Euro Mystery Cheese", price=1.00, quantity=500)
-    toilet_paper = Product("Aldi XXL Toilet Paper Pack (Because You Never Know)", price=3.99, quantity=200)
+    aldi_products = [products.Product("Aldi's 39-cent Baguette", price=0.39, quantity=1000),
+                    products.LimitedProduct("Aldi’s 1-Euro Mystery Cheese", price=1.00, quantity=500, maximum=10),
+                    products.LimitedProduct("Aldi XXL Toilet Paper Pack (Because You Never Know)", price=3.99, quantity=200, maximum=2),
+                    products.Product("Aldi’s Goat Cheese", price=2.99, quantity=100),
+                    products.Product("Aldi’s Fresh Milk", price=0.89, quantity=500),
+                    products.Product("Aldi’s Eggs", price=1.19, quantity=500),
+                    products.Product("Aldi’s Fresh Orange Juice", price=1.49, quantity=300),
+                    ]
 
-    aldi_sued = Store([baguette, cheese])
+    aldi_sued = Store(aldi_products)
+
+    second_half_price = promotions.SecondHalfPrice("Aldi's Second Half Price!")
+    third_one_free = promotions.ThirdOneFree("Aldi's Third One Free!")
+    thirty_percent = promotions.PercentDiscount("Aldi's 30% Off!", percent=30)
+
+    aldi_products[0].set_promotion(second_half_price)
+    aldi_products[2].set_promotion(third_one_free)
+    aldi_products[-1].set_promotion(thirty_percent)
+
     print(Fore.WHITE + f"Initial total quantity in Aldi Süd: {aldi_sued.get_total_quantity()}" + Style.RESET_ALL)
 
-    print(
-        Fore.YELLOW + "A budget-conscious customer demands more deals... adding the legendary toilet paper!" + Style.RESET_ALL)
+    print(Fore.YELLOW + "A budget-conscious customer demands more deals... adding the legendary toilet paper!" + Style.RESET_ALL)
+    toilet_paper = aldi_products[2]
     aldi_sued.add_product(toilet_paper)
-    print(
-        Fore.WHITE + f"Total quantity after adding toilet paper: {aldi_sued.get_total_quantity()}" + Style.RESET_ALL)
+    print(Fore.WHITE + f"Total quantity after adding toilet paper: {aldi_sued.get_total_quantity()}" + Style.RESET_ALL)
 
-    print(
-        Fore.YELLOW + "A customer finds out the cheese is actually goat cheese... returning it!" + Style.RESET_ALL)
+    print(Fore.YELLOW + "A customer finds out the cheese is actually goat cheese... returning it!" + Style.RESET_ALL)
+    cheese = aldi_products[1]
     aldi_sued.remove_product(cheese)
-    print(
-        Fore.WHITE + f"Total quantity after removing the cheese: {aldi_sued.get_total_quantity()}" + Style.RESET_ALL)
+    print(Fore.WHITE + f"Total quantity after removing the cheese: {aldi_sued.get_total_quantity()}" + Style.RESET_ALL)
 
-    print(
-        Fore.YELLOW + "Placing a very strategic order: 10 baguettes and 2 toilet paper packs (classic combo)." + Style.RESET_ALL)
+    print(Fore.YELLOW + "Placing a very strategic order: 10 baguettes and 2 toilet paper packs (classic combo)." + Style.RESET_ALL)
+    baguette = aldi_products[0]
     order_cost = aldi_sued.order([(baguette, 10), (toilet_paper, 2)])
-    print(
-        Fore.WHITE + f"Total order cost (including the typical Aldi surprise discount): {order_cost}" + Style.RESET_ALL)
+    print(Fore.WHITE + f"Total order cost (including the typical Aldi surprise discount): {order_cost}" + Style.RESET_ALL)
 
-    print(
-        Fore.YELLOW + "Checking remaining products in store... what’s left after the morning rush?" + Style.RESET_ALL)
+    print(Fore.YELLOW + "Checking remaining products in store... what’s left after the morning rush?" + Style.RESET_ALL)
     active_products = aldi_sued.get_all_products()
     for product in active_products:
         print(Fore.WHITE + f"- {product.name}: {product.quantity} available" + Style.RESET_ALL)
 
     print(Fore.YELLOW + "Final total quantity in Aldi Süd:" + Style.RESET_ALL)
-    print(Fore.WHITE + f"{aldi_sued.quantity()}" + Style.RESET_ALL)
+    print(Fore.WHITE + f"{aldi_sued.get_total_quantity()}" + Style.RESET_ALL)
 
-    print(
-        Fore.GREEN + "Remember: If it's not in stock, come back next week – maybe it'll be back, maybe it'll be gone forever!" + Style.RESET_ALL)
+    print(Fore.GREEN + "Remember: If it's not in stock, come back next week – maybe it'll be back, maybe it'll be gone forever!" + Style.RESET_ALL)
+
+    # Allow user to place an order
+    aldi_sued.place_order_form()
 
 
 def quit_store():
@@ -69,7 +80,7 @@ def start(store):
         print(Fore.WHITE + " 1 - LIST ALL PRODUCTS" + Style.RESET_ALL)
         print(Fore.WHITE + " 2 - SHOW TOTAL AMOUNT" + Style.RESET_ALL)
         print(Fore.WHITE + " 3 - MAKE AN ORDER" + Style.RESET_ALL)
-        print(Fore.WHITE + " 4 - SHOW STORE DEMO" + Style.RESET_ALL)
+        print('\033[38;2;0;0;95m' + " 4 - GO TO ALDI" + Style.RESET_ALL)
         print(Fore.WHITE + " 5 - QUIT" + Style.RESET_ALL)
         print(Fore.YELLOW + "==================================\n" + Style.RESET_ALL)
 
