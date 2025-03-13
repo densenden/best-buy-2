@@ -36,10 +36,12 @@ class Store:
         return [product for product in self.storage if product.is_active()]
 
     def display_products(self):
-        """Prints all products in a readable format."""
+        """Prints all products in a readable format, including current promotions."""
         print(Fore.GREEN + "\nAvailable Products:" + Style.RESET_ALL)
         for product in self.storage:
-            print(Fore.WHITE + f"- {product.name}: {product.price}€ ({product.quantity} available)" + Style.RESET_ALL)
+            promotion_info = f", Promotion: {product.promotion.name}" if product.promotion else ""
+            print(
+                Fore.WHITE + f"- {product.name}: {product.price}€ ({product.quantity} available){promotion_info}" + Style.RESET_ALL)
 
     def order(self, shopping_list):
         """Gets a list of tuples, where each tuple has 2 items:
