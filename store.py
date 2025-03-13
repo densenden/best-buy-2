@@ -50,10 +50,7 @@ class Store:
         total_price = 0
         for product, quantity in shopping_list:
             if product in self.storage and (product.get_quantity() is None or product.get_quantity() >= quantity):
-                if product.promotion:
-                    total_price += product.promotion.apply_promotion(product, quantity)
-                else:
-                    total_price += product.price * quantity
+                total_price += product.buy(quantity)  # This line activates the buy method
                 if product.get_quantity() is not None:
                     product.set_quantity(product.get_quantity() - quantity)
             else:
