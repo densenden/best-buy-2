@@ -1,28 +1,12 @@
 import promotions
 
 class Product:
-    def __init__(self, name, price, quantity):
-        if not name:
-            raise ValueError("Enter a name. This can't be empty.")
-        self._name = name
+    def __init__(self, name, price, quantity=None):
+        self.name = name
         self.price = price
-        self.quantity = quantity
+        self._quantity = quantity
         self.active = True
-        self.promotion = None  # Add promotion instance variable
-
-    @property
-    def name(self):
-        return self._name
-
-    @property
-    def price(self):
-        return self._price
-
-    @price.setter
-    def price(self, value):
-        if value < 0:
-            raise ValueError("Price cannot be negative.")
-        self._price = value
+        self.promotion = None
 
     @property
     def quantity(self):
@@ -30,11 +14,16 @@ class Product:
 
     @quantity.setter
     def quantity(self, value):
-        if value < 0:
-            raise ValueError("Quantity Error: What were you thinking?")
+        if value is not None and value < 0:
+            raise ValueError("Quantity cannot be negative")
         self._quantity = value
-        if self._quantity == 0:
-            self.deactivate()
+
+    def get_quantity(self):
+        return self._quantity
+
+    def set_quantity(self, value):
+        self.quantity = value
+
 
     def set_promotion(self, promotion):
         self.promotion = promotion
@@ -79,10 +68,7 @@ class Product:
 
 class NonStockedProduct(Product):
     def __init__(self, name, price):
-        super().__init__(name, price, quantity=0)
-
-    def set_quantity(self, quantity):
-        raise ValueError("Cannot set quantity for non-stocked products.")
+        super().__init__(name, price)
 
     def show(self):
         return f"{self.name}, Price: {self.price}, Quantity: Not applicable"

@@ -6,6 +6,12 @@ class Store:
         """Initializes the store with an optional list of products."""
         self.storage = products if products is not None else []
 
+    def get_total_quantity(self):
+        return sum(product.quantity for product in self.products)
+
+    def quantity(self):
+        return self.get_total_quantity()
+
     def add_product(self, product):
         """Adds a new product or increases quantity if it already exists."""
         for existing_product in self.storage:
@@ -35,15 +41,19 @@ class Store:
         for product in self.storage:
             print(Fore.WHITE + f"- {product.name}: {product.price}€ ({product.quantity} available)" + Style.RESET_ALL)
 
-    def order(self, shopping_list): # -> float
+    def order(self, shopping_list):
         """Gets a list of tuples, where each tuple has 2 items:
         Product (Product class) and quantity (int).
         Buys the products and returns the total price of the order."""
         total_price = 0
         for product, quantity in shopping_list:
-            if product in self.storage and product.get_quantity() >= quantity:
-                total_price += product.price * quantity
-                product.set_quantity(product.get_quantity() - quantity)
+            if product in self.storage and (product.get_quantity() is None or product.get_quantity() >= quantity):
+                if product.promotion:
+                    total_price += product.promotion.apply_promotion(product, quantity)
+                else:
+                    total_price += product.price * quantity
+                if product.get_quantity() is not None:
+                    product.set_quantity(product.get_quantity() - quantity)
             else:
                 raise ValueError(f"Not enough stock for {product.name}")
         return total_price
@@ -58,8 +68,9 @@ class Store:
         product_map = {}
         for index, product in enumerate(self.storage, start=1):
             product_map[str(index)] = product
+            promotion_info = f", Promotion: {product.promotion.name}" if product.promotion else ""
             print(
-                Fore.WHITE + f"{index}. {product.name}: {product.price}€ ({product.quantity} available)" + Style.RESET_ALL)
+                Fore.WHITE + f"{index}. {product.name}: {product.price}€ ({product.quantity} available){promotion_info}" + Style.RESET_ALL)
 
         shopping_list = []
         while True:
@@ -80,7 +91,7 @@ class Store:
                 if quantity <= 0:
                     print(Fore.RED + "Quantity must be greater than 0." + Style.RESET_ALL)
                     continue
-                if quantity > product.quantity:
+                if product.quantity is not None and quantity > product.quantity:
                     print(Fore.RED + f"Not enough stock. Only {product.quantity} available." + Style.RESET_ALL)
                     continue
 
@@ -98,7 +109,6 @@ class Store:
                 print(Fore.RED + str(e) + Style.RESET_ALL)
         else:
             print(Fore.YELLOW + "No products were ordered." + Style.RESET_ALL)
-
 
     def show_total_amount(self):
         total_quantity = self.get_total_quantity()

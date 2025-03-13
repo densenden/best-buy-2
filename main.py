@@ -1,6 +1,8 @@
 from colorama import Fore, Style
 from products import Product
 from store import Store
+import products
+import promotions
 
 def store_demo():
     """Creates instances, simulates a budget-conscious shopping experience, and adds some Aldi-flavor."""
@@ -38,7 +40,7 @@ def store_demo():
         print(Fore.WHITE + f"- {product.name}: {product.quantity} available" + Style.RESET_ALL)
 
     print(Fore.YELLOW + "Final total quantity in Aldi Süd:" + Style.RESET_ALL)
-    print(Fore.WHITE + f"{aldi_sued.get_total_quantity()}" + Style.RESET_ALL)
+    print(Fore.WHITE + f"{aldi_sued.quantity()}" + Style.RESET_ALL)
 
     print(
         Fore.GREEN + "Remember: If it's not in stock, come back next week – maybe it'll be back, maybe it'll be gone forever!" + Style.RESET_ALL)
@@ -83,10 +85,23 @@ def start(store):
 
 def main():
     """Instantiation of product, store and menu."""
-    product_list = [Product("MacBook Air M2", price=1450, quantity=190),
-                    Product("Bose QuietComfort Earbuds", price=250, quantity=500),
-                    Product("Google Pixel 7", price=500, quantity=250)
+    # setup initial stock of inventory
+    product_list = [products.Product("MacBook Air M2", price=1450, quantity=100),
+                    products.Product("Bose QuietComfort Earbuds", price=250, quantity=500),
+                    products.Product("Google Pixel 7", price=500, quantity=250),
+                    products.NonStockedProduct("Windows License", price=125),
+                    products.LimitedProduct("Shipping", price=10, quantity=250, maximum=1)
                     ]
+
+    # Create promotion catalog
+    second_half_price = promotions.SecondHalfPrice("Second Half price!")
+    third_one_free = promotions.ThirdOneFree("Third One Free!")
+    thirty_percent = promotions.PercentDiscount("30% off!", percent=30)
+
+    # Add promotions to products
+    product_list[0].set_promotion(second_half_price)
+    product_list[1].set_promotion(third_one_free)
+    product_list[3].set_promotion(thirty_percent)
 
     best_buy = Store(product_list)
 
