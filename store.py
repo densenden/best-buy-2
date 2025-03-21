@@ -1,7 +1,7 @@
 from colorama import Fore, Style
 
 class Store:
-
+    """Represents a store that sells products."""
     def __init__(self, products=None):
         """Initializes the store with an optional list of products."""
         self.storage = products if products is not None else []
@@ -12,6 +12,7 @@ class Store:
     def quantity(self):
         return self.get_total_quantity()
 
+
     def add_product(self, product):
         """Adds a new product or increases quantity if it already exists."""
         for existing_product in self.storage:
@@ -20,6 +21,7 @@ class Store:
                 return
         self.storage.append(product)
 
+
     def remove_product(self, product):
         """Removes a product from store."""
         if product in self.storage:
@@ -27,13 +29,16 @@ class Store:
         else:
             raise ValueError(f"Product '{product.name}' not found in store.")
 
+
     def get_total_quantity(self):  #-> int
         """Returns how many items are in the store in total."""
-        return sum(product.quantity for product in self.storage)
+        return sum(product.quantity or 0 for product in self.storage)
+
 
     def get_all_products(self): # -> List[Product]
         """Returns all products in the store that are active."""
         return [product for product in self.storage if product.is_active()]
+
 
     def display_products(self):
         """Prints all products in a readable format, including current promotions."""
@@ -43,19 +48,18 @@ class Store:
             print(
                 Fore.WHITE + f"- {product.name}: {product.price}€ ({product.quantity} available){promotion_info}" + Style.RESET_ALL)
 
+
     def order(self, shopping_list):
-        """Gets a list of tuples, where each tuple has 2 items:
-        Product (Product class) and quantity (int).
-        Buys the products and returns the total price of the order."""
         total_price = 0
         for product, quantity in shopping_list:
             if product in self.storage and (product.get_quantity() is None or product.get_quantity() >= quantity):
-                total_price += product.buy(quantity)  # This line activates the buy method
-                if product.get_quantity() is not None:
-                    product.set_quantity(product.get_quantity() - quantity)
+                if product.promotion:
+                    total_price += product.promotion.apply_promotion(product, quantity)
+                product.buy(quantity)
             else:
                 raise ValueError(f"Not enough stock for {product.name}")
         return total_price
+
 
     def place_order_form(self):
         """Allows a user to place an order by selecting products by number and entering quantities."""
@@ -69,7 +73,7 @@ class Store:
             product_map[str(index)] = product
             promotion_info = f", Promotion: {product.promotion.name}" if product.promotion else ""
             print(
-                Fore.WHITE + f"{index}. {product.name}: {product.price}€ ({product.quantity} available){promotion_info}" + Style.RESET_ALL)
+                Fore.WHITE + f"{index}. {product.name}: {product.price}€ ({product.quantity or 0} available){promotion_info}" + Style.RESET_ALL)
 
         shopping_list = []
         while True:
@@ -111,7 +115,7 @@ class Store:
 
     def show_total_amount(self):
         total_quantity = self.get_total_quantity()
-        total_value = sum(product.price * product.quantity for product in self.storage)
+        total_value = sum(product.price * (product.quantity or 0) for product in self.storage)  # Edited line
         print(Fore.YELLOW + "\nTotal amount in store:" + Style.RESET_ALL)
         print(Fore.WHITE + f"{total_quantity} items available" + Style.RESET_ALL)
         print(Fore.WHITE + f"Total store value: ${total_value}" + Style.RESET_ALL)
