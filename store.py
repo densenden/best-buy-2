@@ -73,9 +73,22 @@ class Store:
             print(Fore.RED + "The store is empty. No products available for order." + Style.RESET_ALL)
             return
 
-        self.display_products(numbered=True)
+        # Filter products with quantity greater than 0
+        available_products = [product for product in self.storage if product.quantity is not None and product.quantity > 0]
 
-        product_map = {str(index): product for index, product in enumerate(self.storage, start=1)}
+        if not available_products:
+            print(Fore.RED + "No products with available stock." + Style.RESET_ALL)
+            return
+
+        # Display only available products
+        for index, product in enumerate(available_products, start=1):
+            promotion_info = f"Promotion: {product.promotion.name}" if product.promotion else "Regular Best Price"
+            product_type = "Limited Product" if isinstance(product, LimitedProduct) else ("Non-Stocked Product" if isinstance(product, NonStockedProduct) else "Regular Product")
+            product_type_info = f"{product_type}"
+            print(
+                Fore.YELLOW + f"{index}. {product.name} ({product.price}€)  " + Fore.WHITE + f"▸{product.quantity} available ▸{promotion_info} ▸{product_type_info} \n" + Style.RESET_ALL)
+
+        product_map = {str(index): product for index, product in enumerate(available_products, start=1)}
 
         shopping_list = []
         while True:
