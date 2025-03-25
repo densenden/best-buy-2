@@ -1,4 +1,5 @@
 from colorama import Fore, Style
+from products import LimitedProduct, NonStockedProduct
 
 class Store:
     """Represents a store that sells products."""
@@ -41,12 +42,14 @@ class Store:
 
 
     def display_products(self):
-        """Prints all products in a readable format, including current promotions."""
-        print(Fore.GREEN + "\nAvailable Products:" + Style.RESET_ALL)
+        """Prints all products in a readable format, including current promotions and product types."""
+        print(Fore.GREEN + "\nAvailable Products:\n" + Style.RESET_ALL)
         for product in self.storage:
-            promotion_info = f", Promotion: {product.promotion.name}" if product.promotion else ""
+            promotion_info = f"Promotion: {product.promotion.name}" if product.promotion else ", Promotion: Regular Best Price"
+            product_type = "Limited Product" if isinstance(product, LimitedProduct) else ("Non-Stocked Product" if isinstance(product, NonStockedProduct) else "Regular Product")
+            product_type_info = f"Type: {product_type}"
             print(
-                Fore.WHITE + f"- {product.name}: {product.price}€ ({product.quantity} available){promotion_info}" + Style.RESET_ALL)
+                Fore.YELLOW + f"{product.name} ({product.price}€)  " + Fore.WHITE + f"▸{product.quantity} available ▸{promotion_info} ▸{product_type_info} \n" + Style.RESET_ALL)
 
 
     def order(self, shopping_list):
@@ -55,6 +58,8 @@ class Store:
             if product in self.storage and (product.get_quantity() is None or product.get_quantity() >= quantity):
                 if product.promotion:
                     total_price += product.promotion.apply_promotion(product, quantity)
+                else:
+                    total_price += product.price * quantity
                 product.buy(quantity)
             else:
                 raise ValueError(f"Not enough stock for {product.name}")
@@ -71,7 +76,9 @@ class Store:
         product_map = {}
         for index, product in enumerate(self.storage, start=1):
             product_map[str(index)] = product
-            promotion_info = f", Promotion: {product.promotion.name}" if product.promotion else ""
+            promotion_info = f", Promotion: {product.promotion.name}" if product.promotion else ", Promotion: Regular Best Price"
+            product_type = "Limited Product" if isinstance(product, LimitedProduct) else ("Non-Stocked Product" if isinstance(product, NonStockedProduct) else "Regular Product")
+            product_type_info = f"Type: {product_type}"
             print(
                 Fore.WHITE + f"{index}. {product.name}: {product.price}€ ({product.quantity or 0} available){promotion_info}" + Style.RESET_ALL)
 
