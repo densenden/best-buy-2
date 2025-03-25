@@ -41,15 +41,16 @@ class Store:
         return [product for product in self.storage if product.is_active()]
 
 
-    def display_products(self):
-        """Prints all products in a readable format, including current promotions and product types."""
+    def display_products(self, numbered=False):
+        """Prints all products in a readable format, including current promotions and product types. Optionally, returns a numbered list."""
         print(Fore.GREEN + "\nAvailable Products:\n" + Style.RESET_ALL)
-        for product in self.storage:
-            promotion_info = f"Promotion: {product.promotion.name}" if product.promotion else ", Promotion: Regular Best Price"
+        for index, product in enumerate(self.storage, start=1):
+            promotion_info = f"Promotion: {product.promotion.name}" if product.promotion else "Regular Best Price"
             product_type = "Limited Product" if isinstance(product, LimitedProduct) else ("Non-Stocked Product" if isinstance(product, NonStockedProduct) else "Regular Product")
-            product_type_info = f"Type: {product_type}"
+            product_type_info = f"{product_type}"
+            number_prefix = f"{index}. " if numbered else ""
             print(
-                Fore.YELLOW + f"{product.name} ({product.price}€)  " + Fore.WHITE + f"▸{product.quantity} available ▸{promotion_info} ▸{product_type_info} \n" + Style.RESET_ALL)
+                Fore.YELLOW + f"{number_prefix}{product.name} ({product.price}€)  " + Fore.WHITE + f"▸{product.quantity} available ▸{promotion_info} ▸{product_type_info} \n" + Style.RESET_ALL)
 
 
     def order(self, shopping_list):
@@ -72,15 +73,9 @@ class Store:
             print(Fore.RED + "The store is empty. No products available for order." + Style.RESET_ALL)
             return
 
-        print(Fore.GREEN + "\nAvailable Products:" + Style.RESET_ALL)
-        product_map = {}
-        for index, product in enumerate(self.storage, start=1):
-            product_map[str(index)] = product
-            promotion_info = f", Promotion: {product.promotion.name}" if product.promotion else ", Promotion: Regular Best Price"
-            product_type = "Limited Product" if isinstance(product, LimitedProduct) else ("Non-Stocked Product" if isinstance(product, NonStockedProduct) else "Regular Product")
-            product_type_info = f"Type: {product_type}"
-            print(
-                Fore.WHITE + f"{index}. {product.name}: {product.price}€ ({product.quantity or 0} available){promotion_info}" + Style.RESET_ALL)
+        self.display_products(numbered=True)
+
+        product_map = {str(index): product for index, product in enumerate(self.storage, start=1)}
 
         shopping_list = []
         while True:
