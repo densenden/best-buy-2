@@ -73,11 +73,13 @@ class Store:
             print(Fore.RED + "The store is empty. No products available for order." + Style.RESET_ALL)
             return
 
-        # Filter products with quantity greater than 0
-        available_products = [product for product in self.storage if product.quantity is not None and product.quantity > 0]
+        # Modified filter to include non-stocked products
+        available_products = [product for product in self.storage if
+                              (product.quantity is None) or  # Non-stocked products
+                              (product.quantity is not None and product.quantity > 0)]  # Products with available stock
 
         if not available_products:
-            print(Fore.RED + "No products with available stock." + Style.RESET_ALL)
+            print(Fore.RED + "No products available for order." + Style.RESET_ALL)
             return
 
         # Display only available products

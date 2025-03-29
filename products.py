@@ -83,6 +83,10 @@ class NonStockedProduct(Product):
     def __init__(self, name, price):
         super().__init__(name, price)
 
+    def buy(self, quantity):
+        print(f"Purchasing {quantity} of {self.name} (non-stocked item)")
+        return self.price * quantity
+
     def show(self):
         return f"{self.name}, Price: {self.price}, Quantity: Not applicable"
 
